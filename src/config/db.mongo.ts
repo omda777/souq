@@ -13,5 +13,5 @@ export const connectMongo = async() => {
     });
 };
 
-export { mongoose };
-export default connectMongo;
+
+export default mongoose;

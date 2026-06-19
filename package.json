@@ -24,18 +24,21 @@
   },
   "homepage": "https://github.com/omda777/souq#readme",
   "dependencies": {
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "mongodb": "^7.2.0",
     "mongoose": "^9.6.2",
-    "morgan": "^1.10.1",
+    "morgan": "^1.11.0",
     "pg": "^8.21.0",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.8",
     "typescript": "^6.0.3"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/morgan": "^1.9.10",
     "@types/node": "^25.9.1",
     "nodemon": "^3.1.14",
     "ts-node-dev": "^2.0.0",

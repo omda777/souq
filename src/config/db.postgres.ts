@@ -30,12 +30,14 @@ const sequelize = new Sequelize(
   },
 );
 
-export default async () => {
-  await sequelize
+export const connectPostgres = async () => {
+  try {
+    await sequelize
     .authenticate()
-    .then(() => console.log("Connected to PostgreSQL"))
-    .catch((error) => {
-      console.error("PostgreSQL connection error:", error);
-      process.exit(1);
-    });
+    .then(() => console.log("Connected to PostgreSQL"));
+  } catch (error) {
+    console.error("PostgreSQL connection error:", error);
+  } 
 };
+
+export default sequelize;
