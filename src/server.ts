@@ -1,21 +1,21 @@
 import http from 'http';
-import dotenv from 'dotenv';
 
+import './config/config.js';
 import app from './app.js';
 
-dotenv.config();
-
-import connectMongo from './config/db.mongo.js';
-import connectPostgres from './config/db.postgres.js';
-
+import {connectMongo} from './config/db.mongo.js';
+import {connectPostgres} from './config/db.postgres.js';
+import { syncDB } from './models/pg/index.js';
 
 const PORT = process.env.PORT || 3000;
 
 const startServer = async () => {
   try {
     // connect databases
-    connectMongo();
-    connectPostgres();
+    await connectMongo();
+    await connectPostgres();
+    await syncDB();
+    
     // create server
     const server = http.createServer(app);
 
