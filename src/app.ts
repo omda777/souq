@@ -28,7 +28,7 @@ app.use('/{*splat}', (req: Request, res: Response, next: NextFunction) => {
 
 // Error Handling 
 app.use((err: appError, req: Request, res: Response, next: NextFunction) => {
-    res.status(err.statusCode || 500).json({ status: err.statusText, message: err.message , data : null});
+    res.status(err.statusCode || 500).json({ status: err.statusText || httpStatus.ERROR, message: err.message , data : null});
 });
 
 export default app;

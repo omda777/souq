@@ -1,15 +1,29 @@
 import { Request, Response, NextFunction } from 'express';
 import catchAsync from '../../middlewares/catchAsync.js';
 import authService from './auth.service.js';
+import { sendCreated } from '../../utils/apiResponse.js';
 
 const register = catchAsync( async (req:Request , res:Response , next:NextFunction) => {
-    console.log(req.body);
-    await authService.register(req.body);
-    res.status(201).json({
-        status: 'success',
-        message: 'User registered successfully'
-    });
+    
+    const user =  await authService.register(req.body);
+    
+    return sendCreated(
+    res,
+    user,
+    'Account created successfully. Please check your email to verify.'
+  );
 
 });
 
-export default {register}
+const login = catchAsync( async (req:Request , res:Response , next:NextFunction) => {
+  console.log('Login request body:', req.body); // Debugging line
+  const user =  await authService.login(req.body);
+  return res.status(200).json({
+    status: 'success',
+    message: 'Logged in successfully',
+    data: user,
+  });
+    
+});
+
+export default {register ,login}

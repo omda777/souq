@@ -1,8 +1,38 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import  sequelize  from '../../config/db.postgres.js';
+import { UserRole } from '../../types/index.js';
 
+interface UserAttributes {
+  id: string;
+  name: string;
+  email: string;
+  passwordHash: string;
+  role: UserRole;
+  isVerified: boolean;
+  isActive: boolean;
+  verificationToken: string | null;
+  resetToken: string | null;
+  resetTokenExpiry: Date | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
-const User = sequelize.define(
+interface UserCreationAttributes
+  extends Optional<
+    UserAttributes,
+    | "id"
+    | "role"
+    | "isVerified"
+    | "isActive"
+    | "verificationToken"
+    | "resetToken"
+    | "resetTokenExpiry"
+  > {}
+
+type UserInstance = Model<UserAttributes, UserCreationAttributes> &
+  UserAttributes;
+
+const User = sequelize.define<UserInstance>(
   'User',
   {
     id: {
