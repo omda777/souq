@@ -2,6 +2,7 @@ import  sequelize from '../../config/db.postgres.js';
 
 // ── import all models (
 import User from './User.js';
+import Category from './Category.js'
 
 // ── associations (define when you add related models)
 
@@ -11,4 +12,4 @@ export const syncDB = async (): Promise<void> => {
   console.log('Tables synced');
 };
 
-export { sequelize, User };
+export { sequelize, User , Category};

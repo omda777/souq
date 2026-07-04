@@ -7,6 +7,7 @@ import httpStatus from './types/httpStatus.js';
 
 // routes
 import authRoutes from './modules/auth/auth.routes.js';
+import categoriesRoutes from './modules/Categories/Categories.routes.js'
 
 const app = express();
 
@@ -19,6 +20,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/categories' , categoriesRoutes)
 
 // 404 Not Found 
 app.use('/{*splat}', (req: Request, res: Response, next: NextFunction) => {
