@@ -14,3 +14,15 @@ export const sendCreated = (
         data
     });
 };
+
+export const sendSucess = (res : Response, data : any, message : string) =>{
+    return res.status(200).json({
+        status :httpStatus.SUCCESS ,
+        message ,
+        data : data
+    })
+}
+
+export const sendNoContent = (res : Response) =>{
+    return res.status(204).send();
+}

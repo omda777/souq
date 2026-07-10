@@ -59,9 +59,10 @@ Category.init({
         key: 'id',
       },
     },
-    depth : {
-        type : DataTypes.NUMBER ,
-        allowNull : false ,
+    depth: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
     },
     isActive : {
         type : DataTypes.BOOLEAN ,
