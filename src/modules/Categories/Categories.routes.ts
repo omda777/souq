@@ -1,19 +1,36 @@
 import Router from 'express'
 
 import * as categoryController from './Categories.controller.js'
-import Category from '../../models/pg/Category.js';
-
+import validate from '../../middlewares/Validate.js';
+import {createCategorySchema , updateCategorySchema} from './Categories.validation.js'
 
 const router = Router();
 
-router.post('/' ,categoryController.createCategory);
+router.get(
+    '/' , 
+    categoryController.getAllCategories
+);
 
-router.get('/' , categoryController.getAllCategories);
+router.get(
+    '/:slug' , 
+    categoryController.getCategoryBySlug
+);
 
-router.get('/:slug' , categoryController.getCategoryBySlug);
+router.post(
+    '/' , 
+    validate(createCategorySchema , "body") , 
+    categoryController.createCategory
+);
 
-router.put('/:categoryId', categoryController.updateCategory);
+router.put(
+    '/:categoryId', 
+    validate(updateCategorySchema , "body") , 
+    categoryController.updateCategory
+);
 
-router.delete('/:categoryId' , categoryController.deleteCategory);
+router.delete(
+    '/:categoryId' , 
+    categoryController.deleteCategory
+);
 
 export default router;
