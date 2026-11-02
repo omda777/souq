@@ -1,12 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import User from '../models/pg/User.js';
+import User from '../models/User.js';
 import { AuthRequest } from '../types/index.js';
 import appError from '../utils/appError.js';
 import httpStatus from '../types/httpStatus.js';
-import { StringDataType } from 'sequelize';
 
-interface JwtPayload {
+interface JwtPayload extends jwt.JwtPayload {
   userId: string;
   role: string;
 }
@@ -23,15 +22,22 @@ const authenticate = async (
       throw new appError(401 ,'Authentication token is missing', httpStatus.UNAUTHORIZED);
     }
 
-    const token  = authHeader.split(' ')[1];
+    const token = authHeader.slice('Bearer '.length);
+    if (!token) {
+      throw new appError(401, 'Authentication token is missing', httpStatus.UNAUTHORIZED);
+    }
 
     // verify token
-    const decoded = jwt.verify( token as string , process.env.JWT_ACCESS_SECRET as string ) ;
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET as string);
+    if (typeof decoded === 'string') {
+      throw new appError(401, 'Invalid token', httpStatus.UNAUTHORIZED);
+    }
+    const payload = decoded as unknown as JwtPayload;
 
     // check user still exists and is active
     const user = await User.findOne({
-      where: { id: decoded.userId, isActive: true },
-      attributes: ['id', 'email', 'role', 'isVerified'],
+      _id: payload.userId,
+      isActive: true,
     });
 
     if (!user) throw new appError(401, 'User no longer exists', httpStatus.UNAUTHORIZED);

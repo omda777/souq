@@ -1,6 +1,5 @@
 import {Request , Response , NextFunction} from 'express'
 
-import Category from "../../models/pg/Category.js";
 import catchAsync from "../../middlewares/catchAsync.js";
 import * as categoriesService from './Categories.service.js';
 import {  sendCreated , sendSucess , sendNoContent} from '../../utils/apiResponse.js';

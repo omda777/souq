@@ -16,7 +16,6 @@ const register = catchAsync( async (req:Request , res:Response , next:NextFuncti
 });
 
 const login = catchAsync( async (req:Request , res:Response , next:NextFunction) => {
-  console.log('Login request body:', req.body); // Debugging line
   const user =  await authService.login(req.body);
   return res.status(200).json({
     status: 'success',

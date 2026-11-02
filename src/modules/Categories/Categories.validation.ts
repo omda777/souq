@@ -7,7 +7,7 @@ export const createCategorySchema = z.object({
     .max(100, 'Category name must be at most 100 characters'),
   parentId: z
     .string()
-    .uuid('Parent ID must be a valid UUID')
+    .regex(/^[a-f\\d]{24}$/i, 'Parent ID must be a valid MongoDB ObjectId')
     .nullable()
     .optional(),
   image: z.string().url('Image must be a valid URL').optional(),

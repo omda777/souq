@@ -4,13 +4,13 @@ import './config.js';
 
 const mongoUrl = process.env.MONGO_URI as string;
 
-export const connectMongo = async() => {
-    await mongoose.connect(mongoUrl)
-    .then(() => console.log('Connected to MongoDB'))
-    .catch((error) => {
-        console.error('MongoDB connection error:', error);
-        process.exit(1);
-    });
+export const connectMongo = async (): Promise<void> => {
+  if (!mongoUrl) {
+    throw new Error('MONGO_URI is required');
+  }
+
+  await mongoose.connect(mongoUrl);
+  console.log('Connected to MongoDB');
 };
 
 

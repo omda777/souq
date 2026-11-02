@@ -1,4 +1,5 @@
-import Category from "../../models/pg/Category.js";
+import Category, { type ICategory } from '../../models/Category.js';
+import type { HydratedDocument } from 'mongoose';
 import appError from "../../utils/appError.js";
 import httpStatus from "../../types/httpStatus.js";
 import generateSlug from "../../utils/slug.js";
@@ -27,7 +28,7 @@ interface CategoryTreeNode {
 const createUniqueSlug = async (name : string) : Promise<string> =>{
     let slug = generateSlug(name);
     
-    let isExisting = await Category.findOne({where :{slug}})
+    let isExisting = await Category.exists({ slug });
 
     if(!isExisting) return slug;
 
@@ -36,7 +37,7 @@ const createUniqueSlug = async (name : string) : Promise<string> =>{
 
     while(isExisting){
         slug = `${base}-${count}`;
-        isExisting = await Category.findOne({where :{slug}});
+        isExisting = await Category.exists({ slug });
         count++;
     }
     
@@ -44,11 +45,14 @@ const createUniqueSlug = async (name : string) : Promise<string> =>{
 }
 
 
-const buildCategoryTree = (categories : Category [], parent : (string | null) = null): CategoryTreeNode[] =>{
+const buildCategoryTree = (
+  categories: HydratedDocument<ICategory>[],
+  parent: string | null = null,
+): CategoryTreeNode[] => {
     return categories
-    .filter((cat) => cat.parentId == parent)
+    .filter((cat) => (cat.parentId ? cat.parentId.toString() : null) === parent)
     .map((cat) => ({
-      id:       cat.id,
+      id:       cat._id.toString(),
       name:     cat.name,
       slug:     cat.slug,
       image:    cat.image,
@@ -65,7 +69,7 @@ export const createCategory = async (input : CreateCategoryInput) =>{
     let depth = 0;
 
     if(parentId) {
-        const parentCategory = await Category.findByPk(parentId);
+        const parentCategory = await Category.findById(parentId);
         if (parentCategory) {
             depth = parentCategory.depth + 1;
         }
@@ -87,45 +91,43 @@ export const createCategory = async (input : CreateCategoryInput) =>{
 }
 
 export const getAllCategories = async () => {
-    const categories = await Category.findAll({
-    where: { isActive: true },
-    order: [['name', 'ASC']],
-  });
+    const categories = await Category.find({ isActive: true }).sort({ name: 1 });
     return buildCategoryTree(categories);
 };
 
 export const getCategoryBySlug = async (slug : string) => {
-    const category = await Category.findOne({where : {slug , isActive : true}});
+    const category = await Category.findOne({ slug, isActive: true });
     if(!category) throw new appError(404 , "Category not found" , httpStatus.NOT_FOUND);
 
-    const categories = await Category.findAll({
-        where : {isActive : true , parentId : category.id},
-        order: [['name', 'ASC']],
-    })
+    const categories = await Category.find({
+      isActive: true,
+      parentId: category._id,
+    }).sort({ name: 1 });
     return {category , children : categories} ;
 }
 
 export const updateCategory = async (categoryId : string , input : UpdateCategoryInput) => {
-    const category = await Category.findByPk(categoryId);
+    const category = await Category.findById(categoryId);
     if(!category) throw new appError(404 , "Category not found" , httpStatus.NOT_FOUND);
 
     let slug : string  = category.slug ;
     if(input.name && input.name != category.name)
         slug = await createUniqueSlug(input.name);
 
-    await category.update({...input , slug});
+    category.set({ ...input, slug });
+    await category.save();
 
     return category;
 
 }
 
 export const deleteCategory = async (categoryId : string) => {
-    const category = await Category.findByPk(categoryId);
+    const category = await Category.findById(categoryId);
     if(!category) throw new appError(404 , "Category not found" , httpStatus.NOT_FOUND);
 
-    const childrenCount = await Category.count({where : {parentId :category.id}})
+    const childrenCount = await Category.countDocuments({ parentId: category._id });
     if(childrenCount > 0)
         throw new appError(400 ,       'Cannot delete a category that has subcategories. Delete or move them first.', httpStatus.FORBIDDEN);
 
-    await category.destroy();
+    await category.deleteOne();
 }
